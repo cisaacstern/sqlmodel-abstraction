@@ -140,6 +140,13 @@ class GenerateEndpoints:
     models: MultipleModels
     limit: Query = Query(default=100, lte=100)
 
+    def __post_init__(self):
+        _ = self.make_create_endpoint()
+        _ = self.make_read_range_endpoint()
+        _ = self.make_read_single_endpoint()
+        _ = self.make_update_endpoint()
+        _ = self.make_delete_endpoint()
+
 
     def make_create_endpoint(self):
         @self.api.post(self.models.path, response_model=self.models.response)

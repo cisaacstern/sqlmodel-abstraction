@@ -5,6 +5,7 @@ from sqlmodel import Session, SQLModel, create_engine
 
 from .abstractions import MultipleModels, GenerateEndpoints
 
+
 class HeroBase(SQLModel):
     name: str
     secret_name: str
@@ -16,9 +17,7 @@ class HeroRead(HeroBase):
 
 
 hero_models = MultipleModels(path="/heroes/", base=HeroBase, response=HeroRead)
-Hero = hero_models.table
-HeroCreate = hero_models.creation
-HeroUpdate = hero_models.update
+Hero = hero_models.table  # Shim to avoid changing tests.
 
 sqlite_file_name = "database.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"
@@ -39,8 +38,3 @@ def get_session():
 app = FastAPI()
 
 hero_endpoints = GenerateEndpoints(app, get_session, hero_models)
-create_hero = hero_endpoints.make_create_endpoint()
-read_heroes = hero_endpoints.make_read_range_endpoint()
-read_hero = hero_endpoints.make_read_single_endpoint()
-update_hero = hero_endpoints.make_update_endpoint()
-delete_hero = hero_endpoints.make_delete_endpoint()
