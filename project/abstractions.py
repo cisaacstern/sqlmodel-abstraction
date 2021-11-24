@@ -78,7 +78,7 @@ class MultipleModels:
         )
 
 
-# Generalized API functions ---------------------------------------------------------------
+# SQLModel database interface functions ---------------------------------------------------
 
 
 def create(*, session: Session, table_cls: SQLModel, model: SQLModel) -> SQLModel:
@@ -122,12 +122,12 @@ def delete(*, session: Session, table_cls: SQLModel, id: int) -> dict:
     return {"ok": True}
 
 
-# Endpoint generator ----------------------------------------------------------------------
+# Endpoint registration -------------------------------------------------------------------
 
 
 @dataclass
-class GenerateEndpoints:
-    """From a ``MultipleModels`` object, generate create, read, update, delete (CRUD) API endpoints.
+class RegisterEndpoints:
+    """From a ``MultipleModels`` object, register create, read, update, delete (CRUD) API endpoints.
 
     :param api: The ``FastAPI`` instance.
     :param get_session: A function which yields a context-managed ``sqlmodel.Session`` object.
@@ -141,50 +141,51 @@ class GenerateEndpoints:
     limit: Query = Query(default=100, lte=100)
 
     def __post_init__(self):
-        _ = self.make_create_endpoint()
-        _ = self.make_read_range_endpoint()
-        _ = self.make_read_single_endpoint()
-        _ = self.make_update_endpoint()
-        _ = self.make_delete_endpoint()
+        self.register_all()
 
+    def register_all(self):
+        self.register_create_endpoint()
+        self.register_read_range_endpoint()
+        self.register_read_single_endpoint()
+        self.register_update_endpoint()
+        self.register_delete_endpoint()
 
-    def make_create_endpoint(self):
+    def register_create_endpoint(self):
         @self.api.post(self.models.path, response_model=self.models.response)
         def endpoint(*, session: Session = Depends(self.get_session), model: self.models.creation):
             return create(session=session, table_cls=self.models.table, model=model)
 
-        return endpoint
-
-    def make_read_range_endpoint(self):
+    def register_read_range_endpoint(self):
         @self.api.get(self.models.path, response_model=List[self.models.response])
         def endpoint(
             *, session: Session = Depends(self.get_session), offset: int = 0, limit: int = self.limit,
         ):
             return read_range(
-                session=session, table_cls=self.models.table, offset=offset, limit=limit
+                session=session, table_cls=self.models.table, offset=offset, limit=limit,
             )
 
-        return endpoint
-
-    def make_read_single_endpoint(self):
+    def register_read_single_endpoint(self):
         @self.api.get(self.models.path + "{id}", response_model=self.models.response)
         def endpoint(*, session: Session = Depends(self.get_session), id: int):
             return read_single(session=session, table_cls=self.models.table, id=id)
 
-        return endpoint
-
-    def make_update_endpoint(self):
+    def register_update_endpoint(self):
         @self.api.patch(self.models.path + "{id}", response_model=self.models.response)
         def endpoint(
             *, session: Session = Depends(self.get_session), id: int, model: self.models.update,
         ):
             return update(session=session, table_cls=self.models.table, id=id, model=model)
 
-        return endpoint
-
-    def make_delete_endpoint(self):
+    def register_delete_endpoint(self):
         @self.api.delete(self.models.path + "{id}")
         def endpoint(*, session: Session = Depends(self.get_session), id: int):
             return delete(session=session, table_cls=self.models.table, id=id)
 
-        return endpoint
+
+def register_endpoints(
+    api: FastAPI,
+    get_session: Callable,
+    models: MultipleModels,
+    limit: Query = Query(default=100, lte=100)
+):
+    _ = RegisterEndpoints(api, get_session, models, limit)

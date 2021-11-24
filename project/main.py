@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import FastAPI
 from sqlmodel import Session, SQLModel, create_engine
 
-from .abstractions import MultipleModels, GenerateEndpoints
+from .abstractions import MultipleModels, register_endpoints
 
 
 class HeroBase(SQLModel):
@@ -37,4 +37,4 @@ def get_session():
 
 app = FastAPI()
 
-hero_endpoints = GenerateEndpoints(app, get_session, hero_models)
+register_endpoints(app, models=hero_models, get_session=get_session)
