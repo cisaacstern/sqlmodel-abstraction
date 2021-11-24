@@ -2,7 +2,7 @@
 
 An exploration of ideas for abstracting generation of SQLModel objects + FastAPI endpoints.
 
-# Motivation
+# 🤩 Motivation
 
 [SQLModel](https://sqlmodel.tiangolo.com) is an elegant and intuitive package for building Pydantic-parsed SQL databases with a FastAPI interface.
 
@@ -10,7 +10,7 @@ We (core developers of [Pangeo Forge](https://pangeo-forge.readthedocs.io/en/lat
 
 In the course of prototyping, I ([@cisaacstern](https://github.com/cisaacstern)) came to wonder if introducing an abstraction/convenience layer on top of some of SQLModel's core functionality might make it easier to develop our application. This repo is an experimental implemention of that convenience layer. 
 
-# Setup
+# 🔧 Setup
 
 ## Clone repo & install dependencies
 
@@ -30,7 +30,7 @@ In the course of prototyping, I ([@cisaacstern](https://github.com/cisaacstern))
 2. Run `git diff --name-only main abstraction` and note that _**the tests are identical**_ between the `main` and `abstraction` branches; the only changed code is in the `project/main.py` module, and the added `project/abstractions.py` module.
 3. From the repo root on branch `abstraction`, run `pytest` and observe that this abstracted approach passes the same tests as the `main` branch does.
 
-# What has changed?
+# 📝 What has changed?
 
 You will note that the `project/main.py` module has fewer lines of code on branch `abstraction` than on branch `main`. The full diff between these branches is viewable [on GitHub here](https://github.com/cisaacstern/sqlmodel-abstraction/compare/main..abstraction). In brief, the conciseness gains in `project/main.py` are acheived via the addition of two new objects in `project/abstractions.py`:
 
