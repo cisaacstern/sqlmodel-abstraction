@@ -8,7 +8,7 @@ An exploration of ideas for abstracting generation of SQLModel objects + FastAPI
 
 We (core developers of [Pangeo Forge](https://pangeo-forge.readthedocs.io/en/latest/)) are exploring SQLModel for implementing [a database + API for that project](https://github.com/pangeo-forge/roadmap/pull/31).
 
-In the course of prototyping, I (@cisaacstern) came to wonder if introducing an abstraction/convenience layer on top of some of SQLModel's core functionality might make it easier to develop our application. This repo is an experimental implemention of that convenience layer. 
+In the course of prototyping, I ([@cisaacstern](https://github.com/cisaacstern)) came to wonder if introducing an abstraction/convenience layer on top of some of SQLModel's core functionality might make it easier to develop our application. This repo is an experimental implemention of that convenience layer. 
 
 # Setup
 
