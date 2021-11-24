@@ -16,27 +16,35 @@ In the course of prototyping, I ([@cisaacstern](https://github.com/cisaacstern))
 
 1. Clone this repo and `cd` into it
 2. Create and activate a new virtual environment with Python >= 3.6, < 3.10 
-3. From the repo root, run `pip install -r requirements.txt` to install project dependencies
+3. From the repo root, install project dependencies with `pip install -r requirements.txt`
 
-## Confirm `main` tests pass
+## Confirm tests pass
 
-1. Note that on branch `main`, `project/main.py` is copied directly from the the SQLModel docs [tutorial project](https://sqlmodel.tiangolo.com/tutorial/fastapi/tests/#fastapi-application), and that `project/test_main.py` is copied directly from the SQLModel docs [tutorial tests](https://sqlmodel.tiangolo.com/tutorial/fastapi/tests/#add-the-rest-of-the-tests).
+From the repo root, run
 
-2. From the repo root on branch `main`, run `pytest` to confirm that the tutorial project passes its tests in your local environment. (Further detail on running the tests [here](https://sqlmodel.tiangolo.com/tutorial/fastapi/tests/#run-the-tests).)
+```
+$ pytest
+```
 
-## Re-run tests on `abstraction` branch
+to confirm that the project passes its tests in your local environment.
 
-1. Run `git checkout abstraction` to checkout the abstractions proposed by this repo
-2. Run `git diff --name-only main abstraction` and note that _**the tests are identical**_ between the `main` and `abstraction` branches; the only changed code is in the `project/main.py` module, and the added `project/abstractions.py` module.
-3. From the repo root on branch `abstraction`, run `pytest` and observe that this abstracted approach passes the same tests as the `main` branch does.
+# 🤝 Same tests as tutorial
 
-# 📝 What has changed?
+Importantly, in this repo _**the tests are identical**_ to [the tests in the SQLModel docs tutorial](https://sqlmodel.tiangolo.com/tutorial/fastapi/tests/#add-the-rest-of-the-tests).
 
-You will note that the `project/main.py` module has fewer lines of code on branch `abstraction` than on branch `main`. The full diff between these branches is viewable [on GitHub here](https://github.com/cisaacstern/sqlmodel-abstraction/compare/main..abstraction). In brief, the conciseness gains in `project/main.py` are acheived via the addition of two new objects in `project/abstractions.py`:
+As such, the abstracted approach proposed here passes all of the same tests that the official tutorial example does.
 
-- [**`MultipleModels`**](https://github.com/cisaacstern/sqlmodel-abstraction/blob/4867574b3ff2c4aa41524e7e2fd7d97543db5d45/project/abstractions.py#L13): A dataclass that generates classes for the [multiple models with inheritance](https://sqlmodel.tiangolo.com/tutorial/fastapi/multiple-models/#multiple-models-with-inheritance) SQLModel design pattern and places them alongside a specified API endpoint path. This class requires a base model and a response (i.e. reader) model as input, and generates the remaining classes from these two in `__post_init__`. Theoretically, the response model can be deterministically generated from the base model as well (it requires only the addition of a required `id` field). I have not included this feature, however, because I'm not sure if there is a concise way to specify additional required (non-default) fields on a derived class using Python's built-in `type()` or `types.new_class()`.
-- [**`RegisterEndpoints`**](https://github.com/cisaacstern/sqlmodel-abstraction/blob/4867574b3ff2c4aa41524e7e2fd7d97543db5d45/project/abstractions.py#L129): This dataclass takes a `MultipleModels` instance (along with a `FastAPI` instance and `get_session` callable) as input, and from these automatically registers create, read, update, and delete (CRUD) endpoints for the `MultipleModels` instance with the `FastAPI` application instance.
+# 📝 What is changed?
 
-> `register_endpoints` is a convenience function wrapping `RegisterEndpoints`, which is how this object is instantiated within `project/main.py`
+You will note that at 40 lines of code, this repo's [`main.py` module](https://github.com/cisaacstern/sqlmodel-abstraction/blob/main/project/main.py) is less than half as long as the 107-line [`main.py` module in the docs tutorial](https://sqlmodel.tiangolo.com/tutorial/fastapi/tests/#fastapi-application) (also copied [here](https://github.com/cisaacstern/sqlmodel-abstraction/blob/baseline/project/main.py)).
+
+> A full diff between the tutorial's `main.py` and this repo's main module is viewable [on GitHub here](https://github.com/cisaacstern/sqlmodel-abstraction/compare/baseline..main#diff-31264996fec2c210ab27c184fa7c2e98c35b245010e68cfacdb381f28121e7b9).
+
+In brief, the conciseness gains in this repo's `main.py` are acheived via the addition of two objects in a new `abstractions.py` module:
+
+- [**`MultipleModels`**](https://github.com/cisaacstern/sqlmodel-abstraction/blob/5909147685612c3a29faebcfb0332911d47a94ca/project/abstractions.py#L13): A dataclass that generates classes for the [multiple models with inheritance](https://sqlmodel.tiangolo.com/tutorial/fastapi/multiple-models/#multiple-models-with-inheritance) SQLModel design pattern and places them alongside a specified API endpoint path. This class requires a base model and a response (i.e. reader) model as input, and generates the remaining classes from these two in `__post_init__`. Theoretically, the response model can be deterministically generated from the base model as well (it requires only the addition of a required `id` field). I have not included this feature, however, because I'm not sure if there is a concise way to specify additional required (non-default) fields on a derived class using Python's built-in `type()` or `types.new_class()`.
+- [**`RegisterEndpoints`**](https://github.com/cisaacstern/sqlmodel-abstraction/blob/5909147685612c3a29faebcfb0332911d47a94ca/project/abstractions.py#L129): This dataclass takes a `MultipleModels` instance (along with a `FastAPI` instance and `get_session` callable) as input, and from these automatically registers create, read, update, and delete (CRUD) endpoints for the `MultipleModels` instance with the `FastAPI` application instance.
+
+> `register_endpoints` is a convenience function wrapping `RegisterEndpoints`, which is how this object is instantiated within `main.py`
 
 We will greatly appreciate any feedback about potential issues which may arise if we opt to run this approach in production. Are there edge cases, not covered by the tutorial tests, where this style may falter? How might these abstractions be improved or refactored for increased reliability and/or readability? Thank you in advance for your consideration and feedback.
